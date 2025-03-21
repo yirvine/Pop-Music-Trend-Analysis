@@ -1,10 +1,33 @@
-# Setup Spark in Google Colab
-*reference: https://www.analyticsvidhya.com/blog/2020/11/a-must-read-guide-on-how-to-work-with-pyspark-on-google-colab-for-data-scientists/*
+> **Note**: This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
+
+# 🎶 Pop Music Trend Analysis – PySpark & Machine Learning  
+
+A **scalable analysis** of music trends using **Apache Spark & Machine Learning**.  
+This project explores **10 top artists' discographies**, leveraging **PySpark DataFrames, distributed computing, and ML models** to analyze factors influencing **song popularity**.
+
+## 🔍 Key Insights
+- **📊 Data Exploration:** Trends in song counts, tempo distributions, and key signatures.
+- **🎼 Audio Features:** Analyzing **most common keys & tempos** in popular music.
+- **📈 Statistical Patterns:** Why tempos often cluster around multiples of 10.
+- **💡 Predictive Modeling:** Using **Linear Regression & Random Forest** to predict song popularity.
+- **🧠 Correlation Analysis:** Discovering relationships between features like **energy, valence, and danceability**.
+
+---
+
+## 📡 Data Source: Extracting Audio Features from Spotify's Web API  
+The dataset used in this analysis was collected via the **Spotify Web API**, which provides audio feature data such as **tempo, valence, danceability, energy, and key signatures**.  
+Each track’s metadata and audio attributes were retrieved programmatically in JSON format and converted into structured CSV files.
+
+> Note: The API implementation is not included in this notebook for brevity, but it involved querying track details, handling authentication, and transforming JSON responses into tabular data.
 
 
-*to install other versions, get the download link from https://spark.apache.org/downloads.html*
+## ⚙️ Spark Setup in Google Colab
+**Requirements:**
+- ✅ A Google Colab environment
+- ✅ Approx. **3GB free RAM** (since Spark runs in-memory)
+- ✅ Files stored in **Google Drive** (mounted in `/content/drive/`)
 
-
+<details> <summary>Click to expand Spark setup code</summary>
 ```python
 !apt-get install openjdk-8-jdk-headless -qq > /dev/null
 ```
@@ -100,6 +123,7 @@ test.map(lambda x: (x, x**2)).collect()
 
 
 
+
 ```python
 from google.colab import drive
 drive.mount('/content/drive')
@@ -108,7 +132,9 @@ drive.mount('/content/drive')
 
     Mounted at /content/drive
 
+</details>
 
+## 📂 Loading & Combining Data
 
 ```python
 #List of file names
@@ -145,6 +171,7 @@ combined_df.show(5)  # Show the first 5 rows
     
 
 
+## 🛠️ Data Cleaning & Preprocessing
 
 ```python
 from pyspark.sql.functions import col, split
@@ -178,6 +205,8 @@ print(f"The number of rows after data cleaning is: {row_count_clean}")
     The number of rows after data cleaning is: 1906
 
 
+## 📊 Exploratory Data Analysis (EDA)
+### 🎤 Number of Songs per Artist
 
 ```python
 import matplotlib.pyplot as plt
@@ -213,6 +242,7 @@ print(f"Visualization of number of songs per artist. OK I see you T-Swift!")
     Visualization of number of songs per artist. OK I see you T-Swift!
 
 
+### 🎵 Distribution of Song Tempos
 
 ```python
 from pyspark.sql.functions import round, col, count
@@ -260,8 +290,10 @@ print(f"The most popular tempo in the dataset is {mode_tempo} BPM, which is foun
 
 An interesting observation from the histogram above: note how the frequency seems to jump up significantly at every multiple of 10! (e.g. 140 BPM vs 139 or 141)
 
+## 🎼 Key & Mode Analysis
 **Let's analyze keys next:**
 
+### 🎶 Mapping Keys to Musical Notation
 
 ```python
 from pyspark.sql.functions import udf
@@ -340,9 +372,9 @@ cleaned_df.select("Key", "Mode", "TonalKey").show()
     only showing top 20 rows
     
 
-
 The mapping was successful. Let's analyze some data with respect to these keys now.
 
+### 🎹 Most Popular Keys in Pop Music
 
 ```python
 import matplotlib.pyplot as plt
@@ -375,6 +407,8 @@ plt.show()
 
 
 C major is the most popular key in this dataset. It's also the simplest key, involving only the white keys on the piano. It's the easiest key to play and often the first one that musicians are introduced to. Looks like 'simple' translates to 'popular' in the realm of pop music.
+
+## 🔗 Combining Features: Tempo & Key Analysis
 
 Ok, let's combine those features now and look at the most common key / tempo combinations:
 
@@ -415,15 +449,16 @@ plt.show()
 ![png](Top-10-Artists-Preliminary-Analysis_files/Top-10-Artists-Preliminary-Analysis_22_1.png)
     
 
-
+## 📈 Feature Relationships & Popularity Analysis
 TODO: Investigate relationships between some of the features and the target variable, 'popularity'.
 
 Potential plots:
-popularity vs energy
-popularity vs danceability
-popularity vs key
-popularity vs tempo
+popularity vs energy, 
+popularity vs danceability, 
+popularity vs key, 
+popularity vs tempo, 
 
+### 🎭 Do Tempo & Danceability Impact Popularity?
 
 ```python
 
@@ -515,8 +550,13 @@ Looks like there isn't much correlation between danceability and popularity eith
 
 Back to our original target variable, Popularity.
 
+# 🤖 Predicting Popularity with Machine Learning
+
 Below, a linear regression model and random forest regression model are both applied to the dataset, using all ordinal numerical values as features. Key is not included as a feature because the integers are not ordinal (i.e. ranges from 0 to 11 cyclically, the jump from 0 to 1 is the same as the jump from 11 to 0).
 
+## 🔬 Correlation Matrix: How Features Relate to Each Other
+
+### 🔬 Building the Correlation Matrix
 
 ```python
 # Check column data types
@@ -653,21 +693,24 @@ plt.show()
 
 ```
 
+## 📊 Final Analysis: Feature Correlation Heatmap
 
     
 ![png](Top-10-Artists-Preliminary-Analysis_files/Top-10-Artists-Preliminary-Analysis_35_0.png)
-    
-
 
 
 ```python
 
 ```
 
-Some observations:
-- Popularity doesn't seem very correlated with any of the individual features.
-- Loudness and Energy are pretty highly correlated.
-- Acousticness is highly inversely correlated with both Loudness and Energy.
-- Energy and Popularity have a -0.3 correlation which I find somnewhat surprising.
-- Valence (i.e. 'moodiness') is incersely correlated with danceability, energy, and loudness, which is no real surprise.
+## Key Observations
+- Popularity shows little to no strong correlation with any individual feature, suggesting that no single audio characteristic is a dominant predictor.
+- Loudness and Energy are highly correlated, which aligns with expectations—louder tracks tend to feel more energetic.
+- Acousticness is strongly inversely correlated with both Loudness and Energy, reinforcing the idea that highly acoustic tracks tend to be quieter and less energetic.
+- Energy and Popularity exhibit a moderate negative correlation (-0.3), which is somewhat unexpected—suggesting that more energetic tracks are not necessarily more popular.
+- Valence (i.e., perceived mood) is negatively correlated with Danceability, Energy, and Loudness, which aligns with the idea that high-energy, danceable songs tend to feel less "moody" or melancholic.
+
+## 📚 References
+- [Guide: Running PySpark in Google Colab](https://www.analyticsvidhya.com/blog/2020/11/a-must-read-guide-on-how-to-work-with-pyspark-on-google-colab-for-data-scientists/)
+- [Apache Spark Official Downloads](https://spark.apache.org/downloads.html)
 
