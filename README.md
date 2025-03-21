@@ -1,11 +1,11 @@
 > **Note**: This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
 
-# 🎶 Pop Music Trend Analysis – PySpark & Machine Learning  
+# Pop Music Trend Analysis – PySpark & Machine Learning  
 
 A **scalable analysis** of music trends using **Apache Spark & Machine Learning**.  
 This project explores **10 top artists' discographies**, leveraging **PySpark DataFrames, distributed computing, and ML models** to analyze factors influencing **song popularity**.
 
-## 🔍 Key Insights
+## Key Insights
 - **📊 Data Exploration:** Trends in song counts, tempo distributions, and key signatures.
 - **🎼 Audio Features:** Analyzing **most common keys & tempos** in popular music.
 - **📈 Statistical Patterns:** Why tempos often cluster around multiples of 10.
@@ -21,7 +21,7 @@ Each track’s metadata and audio attributes were retrieved programmatically in 
 > Note: The API implementation is not included in this notebook for brevity, but it involved querying track details, handling authentication, and transforming JSON responses into tabular data.
 
 
-## ⚙️ Spark Setup in Google Colab
+## Spark Setup in Google Colab
 **Requirements:**
 - ✅ A Google Colab environment
 - ✅ Approx. **3GB free RAM** (since Spark runs in-memory)
@@ -134,7 +134,7 @@ drive.mount('/content/drive')
 
 </details>
 
-## 📂 Loading & Combining Data
+## Loading & Combining Data
 
 ```python
 #List of file names
@@ -171,7 +171,7 @@ combined_df.show(5)  # Show the first 5 rows
     
 
 
-## 🛠️ Data Cleaning & Preprocessing
+## Data Cleaning & Preprocessing
 
 ```python
 from pyspark.sql.functions import col, split
@@ -205,7 +205,7 @@ print(f"The number of rows after data cleaning is: {row_count_clean}")
     The number of rows after data cleaning is: 1906
 
 
-## 📊 Exploratory Data Analysis (EDA)
+## Exploratory Data Analysis (EDA)
 ### 🎤 Number of Songs per Artist
 
 ```python
@@ -554,9 +554,9 @@ Back to our original target variable, Popularity.
 
 Below, a linear regression model and random forest regression model are both applied to the dataset, using all ordinal numerical values as features. Key is not included as a feature because the integers are not ordinal (i.e. ranges from 0 to 11 cyclically, the jump from 0 to 1 is the same as the jump from 11 to 0).
 
-## 🔬 Correlation Matrix: How Features Relate to Each Other
+## Correlation Matrix: How Features Relate to Each Other
 
-### 🔬 Building the Correlation Matrix
+### Building the Correlation Matrix
 
 ```python
 # Check column data types
@@ -693,7 +693,7 @@ plt.show()
 
 ```
 
-## 📊 Final Analysis: Feature Correlation Heatmap
+## Final Analysis: Feature Correlation Heatmap
 
     
 ![png](Top-10-Artists-Preliminary-Analysis_files/Top-10-Artists-Preliminary-Analysis_35_0.png)
