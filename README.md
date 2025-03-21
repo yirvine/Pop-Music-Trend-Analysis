@@ -14,7 +14,7 @@ This project explores **10 top artists' discographies**, leveraging **PySpark Da
 
 ---
 
-## 📡 Data Source: Extracting Audio Features from Spotify's Web API  
+## Data Source: Extracting Audio Features from Spotify's Web API  
 The dataset used in this analysis was collected via the **Spotify Web API**, which provides audio feature data such as **tempo, valence, danceability, energy, and key signatures**.  
 Each track’s metadata and audio attributes were retrieved programmatically in JSON format and converted into structured CSV files.
 
