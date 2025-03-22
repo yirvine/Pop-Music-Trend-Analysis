@@ -33,14 +33,6 @@ This notebook is divided into four major phases:
 ---
 
 
-
-
-
-
-
-
-
-
 ## 🔗 Table of Contents
 
 - [Phase 1: Data Preparation and Setup](#phase-1-data-preparation-and-setup)
@@ -251,7 +243,7 @@ print(f"The number of rows after data cleaning is: {row_count_clean}")
 
 
 # Phase 2: Exploratory Data Analysis (EDA)
-### 🎤 Number of Songs per Artist
+### Number of Songs per Artist
 
 ```python
 import matplotlib.pyplot as plt
@@ -287,7 +279,7 @@ print(f"Visualization of number of songs per artist. OK I see you T-Swift!")
     Visualization of number of songs per artist. OK I see you T-Swift!
 
 
-### 🎵 Distribution of Song Tempos
+### Distribution of Song Tempos
 
 ```python
 from pyspark.sql.functions import round, col, count
@@ -762,7 +754,7 @@ In this section, we explore song popularity as a **binary classification problem
 
 ---
 
-### 🔧 Data Preprocessing & Label Encoding
+### Data Preprocessing & Label Encoding
 
 ```python
 columns_to_drop = [
@@ -873,7 +865,7 @@ train_data, test_data = balanced_data.randomSplit([0.75, 0.25], seed=42)
 
 ---
 
-### 🖊️ Feature Engineering
+### Feature Engineering
 
 ```python
 from pyspark.sql.functions import when
