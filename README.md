@@ -19,10 +19,9 @@ This project explores **10 top artists' discographies**, leveraging **PySpark Da
 This notebook is divided into two major modeling phases:
 
 1. **Regression Modeling** – Uses linear and ensemble techniques to predict continuous Spotify popularity scores.
-2. **Classification Modeling** – Reframes popularity as a binary variable to classify songs as either "low" or "high" popularity.
+2. **Classification Modeling** – Reframes popularity as a binary variable to classify songs as either "low" or "high" popularity using 3 classification models: (1) Logistic Regression, (2) Decision Tree Classifier, (3) Random Forest Classifier.
 
-Each phase includes: data cleaning, feature engineering, model training, and evaluation.  
-We conclude with a comparison of modeling performance and feature insights.
+Each phase includes: data cleaning, feature engineering, model training, and evaluation. We conclude with a comparison of modeling performance and feature insights.
 
 ---
 
