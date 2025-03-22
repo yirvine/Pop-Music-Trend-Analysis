@@ -1053,9 +1053,15 @@ False Negatives: 54.0
 
 ---
 
-## Summary
-This classification approach produced **moderately strong results** relative to the regression-based analysis. The best model (Random Forest with tuning) achieved ~66% accuracy, suggesting that while audio features don’t predict Spotify popularity perfectly, they do offer **discernible patterns** when treated as a classification problem.
+## Key Takeaways (Phase 4: Classification Modeling)
 
+- Framing popularity as a binary classification task yielded better predictive performance than regression.
+
+- The Random Forest classifier, after hyperparameter tuning, achieved the highest accuracy at ~66%, outperforming Logistic Regression (~63.6%) and Decision Tree (~62%).
+
+- The confusion matrix showed a reasonable balance of true positives and true negatives, indicating both "low" and "high" popularity songs were modeled with moderate success.
+
+- Despite decent performance, no single feature emerged as a dominant predictor — suggesting that popularity is influenced by external factors (e.g., marketing, virality) beyond any specific audio characteristics alone.
 
 
 ## 📚 References
