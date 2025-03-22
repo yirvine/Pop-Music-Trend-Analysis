@@ -7,7 +7,7 @@ This notebook explores whether a song’s **Spotify popularity score** can be pr
 ## Project Summary
 
 - **Goal**: Predict song popularity based on known audio features.
-- ⚙**Tech Stack**: PySpark, Pandas, Matplotlib, scikit-learn.
+- **Tech Stack**: PySpark, Pandas, Matplotlib, scikit-learn.
 - **Models Used**:
   - Regression: Linear Regression, Random Forest Regressor
   - Classification: Logistic Regression, Decision Tree, Random Forest
