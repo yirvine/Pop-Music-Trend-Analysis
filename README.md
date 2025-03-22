@@ -2,7 +2,8 @@
 
 # Pop Music Trend Analysis – PySpark & Machine Learning  
 
-A **scalable analysis** of music trends using **Apache Spark & Machine Learning**.  
+A **scalable analysis** of music trends using **Apache Spark & Machine Learning**.
+
 This project explores **10 top artists' discographies**, leveraging **PySpark DataFrames, distributed computing, and ML models** to analyze factors influencing **song popularity**.
 
 ## Key Insights
@@ -16,30 +17,36 @@ This project explores **10 top artists' discographies**, leveraging **PySpark Da
 
 ## 🗂️ Notebook Structure
 
-This notebook is divided into two major modeling phases:
+This notebook is divided into four major phases:
 
-1. **Regression Modeling** – Uses linear and ensemble techniques to predict continuous Spotify popularity scores.
-2. **Classification Modeling** – Reframes popularity as a binary variable to classify songs as either "low" or "high" popularity using 3 classification models: (1) Logistic Regression, (2) Decision Tree Classifier, (3) Random Forest Classifier.
+**Phase 1:** Data Preparation and Setup – Covers the Spotify API, Colab Spark setup, and data cleaning/preprocessing.
 
-Each phase includes: data cleaning, feature engineering, model training, and evaluation. We conclude with a comparison of modeling performance and feature insights.
+**Phase 2:** Exploratory Data Analysis (EDA) – Visual analyses of tempo, key, and audio feature trends across top artists.
+
+**Phase 3:** Predicting Popularity via Regression Modeling – Uses linear regression and ensemble techniques to predict Spotify popularity as a continuous variable.
+
+**Phase 4:** Predicting Popularity via Classification Modeling – Reframes popularity as a binary classification task using Logistic Regression, Decision Tree, and Random Forest models.
 
 ---
 
-## 🧭 Table of Contents
+## 🔗 Table of Contents
 
-- [Data Source](#data-source-extracting-audio-features-from-spotifys-web-api)
-- [Spark Setup](#spark-setup-in-google-colab)
-- [Loading & Combining Data](#loading--combining-data)
-- [Data Cleaning & Preprocessing](#data-cleaning--preprocessing)
-- [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+- [Phase 1: Data Preparation and Setup](#phase-1-data-preparation-and-setup)
+  - [Data Source](#data-source-extracting-audio-features-from-spotifys-web-api)
+  - [Spark Setup](#spark-setup-in-google-colab)
+  - [Loading & Combining Data](#loading--combining-data)
+  - [Data Cleaning & Preprocessing](#data-cleaning--preprocessing)
+- [Phase 2: Exploratory Data Analysis (EDA)](#phase-2-exploratory-data-analysis-eda)
   - [Number of Songs per Artist](#-number-of-songs-per-artist)
   - [Distribution of Song Tempos](#-distribution-of-song-tempos)
   - [Key & Mode Analysis](#key--mode-analysis)
   - [Feature Relationships](#feature-relationships--popularity-analysis)
-- [Predicting Popularity with Machine Learning](#predicting-popularity-with-machine-learning)
-- [Classification Modeling](#classification-modeling-predicting-song-popularity)
-- [References](#-references)
+- [Phase 3: Predicting Popularity via Regression Modeling](#phase-3-predicting-popularity-via-regression-modeling)
+- [Phase 4: Predicting Popularity via Classification Modeling](#phase-4-predicting-popularity-via-classification-modeling)
+- [📚 References](#-references)
 
+
+# Phase 1: Data Preparation and Setup
 ## Data Source: Extracting Audio Features from Spotify's Web API  
 The dataset used in this analysis was collected via the **Spotify Web API**, which provides audio feature data such as **tempo, valence, danceability, energy, and key signatures**.  
 Each track’s metadata and audio attributes were retrieved programmatically in JSON format and converted into structured CSV files.
@@ -231,7 +238,7 @@ print(f"The number of rows after data cleaning is: {row_count_clean}")
     The number of rows after data cleaning is: 1906
 
 
-## Exploratory Data Analysis (EDA)
+# Phase 2: Exploratory Data Analysis (EDA)
 ### 🎤 Number of Songs per Artist
 
 ```python
@@ -576,7 +583,7 @@ Looks like there isn't much correlation between danceability and popularity eith
 
 Back to our original target variable, Popularity.
 
-# Predicting Popularity with Machine Learning
+# Phase 3: Predicting Popularity via Regression Modeling 
 
 Below, a linear regression model and random forest regression model are both applied to the dataset, using all ordinal numerical values as features. Key is not included as a feature because the integers are not ordinal (i.e. ranges from 0 to 11 cyclically, the jump from 0 to 1 is the same as the jump from 11 to 0).
 
@@ -719,7 +726,7 @@ plt.show()
 
 ```
 
-## Final Phase 1 Analysis: Feature Correlation Heatmap
+## Phase 3 Final Analysis: Feature Correlation Heatmap
 
     
 ![png](Top-10-Artists-Preliminary-Analysis_files/Top-10-Artists-Preliminary-Analysis_35_0.png)
@@ -729,7 +736,7 @@ plt.show()
 
 ```
 
-## Key Observations of Phase 1 Analysis
+### Key Observations of Phase 3 Analysis
 - Popularity shows little to no strong correlation with any individual feature, suggesting that no single audio characteristic is a dominant predictor.
 - Loudness and Energy are highly correlated, which aligns with expectations—louder tracks tend to feel more energetic.
 - Acousticness is strongly inversely correlated with both Loudness and Energy, reinforcing the idea that highly acoustic tracks tend to be quieter and less energetic.
@@ -737,7 +744,7 @@ plt.show()
 - Valence (i.e., perceived mood) is negatively correlated with Danceability, Energy, and Loudness, which aligns with the idea that high-energy, danceable songs tend to feel less "moody" or melancholic.
 
 
-## Classification Modeling: Predicting Song Popularity
+# Phase 4: Predicting Popularity via Classification Modeling
 
 In this section, we explore song popularity as a **binary classification problem**, labeling songs as either "low" or "high" popularity based on their Spotify popularity scores.
 
