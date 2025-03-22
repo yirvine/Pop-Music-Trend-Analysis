@@ -1,4 +1,4 @@
-> **Note**: This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
+> This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
 
 # Pop Music Trend Analysis – PySpark & Machine Learning  
 
@@ -13,6 +13,33 @@ This project explores **10 top artists' discographies**, leveraging **PySpark Da
 - **🧠 Correlation Analysis:** Discovering relationships between features like **energy, valence, and danceability**.
 
 ---
+
+## 🗂️ Notebook Structure
+
+This notebook is divided into two major modeling phases:
+
+1. **Regression Modeling** – Uses linear and ensemble techniques to predict continuous Spotify popularity scores.
+2. **Classification Modeling** – Reframes popularity as a binary variable to classify songs as either "low" or "high" popularity.
+
+Each phase includes: data cleaning, feature engineering, model training, and evaluation.  
+We conclude with a comparison of modeling performance and feature insights.
+
+---
+
+## 🧭 Table of Contents
+
+- [Data Source](#data-source-extracting-audio-features-from-spotifys-web-api)
+- [Spark Setup](#spark-setup-in-google-colab)
+- [Loading & Combining Data](#loading--combining-data)
+- [Data Cleaning & Preprocessing](#data-cleaning--preprocessing)
+- [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+  - [Number of Songs per Artist](#-number-of-songs-per-artist)
+  - [Distribution of Song Tempos](#-distribution-of-song-tempos)
+  - [Key & Mode Analysis](#key--mode-analysis)
+  - [Feature Relationships](#feature-relationships--popularity-analysis)
+- [Predicting Popularity with Machine Learning](#predicting-popularity-with-machine-learning)
+- [Classification Modeling](#classification-modeling-predicting-song-popularity)
+- [References](#-references)
 
 ## Data Source: Extracting Audio Features from Spotify's Web API  
 The dataset used in this analysis was collected via the **Spotify Web API**, which provides audio feature data such as **tempo, valence, danceability, energy, and key signatures**.  
