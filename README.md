@@ -1,4 +1,5 @@
 > This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
+For full, executable versions of the original notebooks, see the [raw-notebooks](./raw-notebooks) folder in the project root.
 
 # Pop Music Trend Analysis – PySpark & Machine Learning
 
