@@ -1,19 +1,21 @@
 > This README is generated from a Jupyter Notebook. The code blocks and figures represent an interactive analysis.
 
-# Pop Music Trend Analysis – PySpark & Machine Learning  
+# Pop Music Trend Analysis – PySpark & Machine Learning
 
-A **scalable analysis** of music trends using **Apache Spark & Machine Learning**.
+This notebook explores whether a song’s **Spotify popularity score** can be predicted using its **audio features** (e.g. tempo, valence, danceability, energy). We analyze the discographies of 10 top global artists using PySpark for distributed processing and machine learning for predictive modeling. The analysis moves from raw data ingestion and EDA to predictive modeling using both regression and classification approaches.
 
-This project explores **10 top artists' discographies**, leveraging **PySpark DataFrames, distributed computing, and ML models** to analyze factors influencing **song popularity**.
+## Project Summary
 
-## Key Insights
-- **📊 Data Exploration:** Trends in song counts, tempo distributions, and key signatures.
-- **🎼 Audio Features:** Analyzing **most common keys & tempos** in popular music.
-- **📈 Statistical Patterns:** Why tempos often cluster around multiples of 10.
-- **💡 Predictive Modeling:** Using **Linear Regression & Random Forest** to predict song popularity.
-- **🧠 Correlation Analysis:** Discovering relationships between features like **energy, valence, and danceability**.
+- **Goal**: Predict song popularity based on known audio features.
+- ⚙**Tech Stack**: PySpark, Pandas, Matplotlib, scikit-learn.
+- **Models Used**:
+  - Regression: Linear Regression, Random Forest Regressor
+  - Classification: Logistic Regression, Decision Tree, Random Forest
+- **Best Performance**: Classification using Random Forest (66% accuracy)
+- **Outcome**: Framing popularity as a binary classification task led to stronger predictive power than regression.
 
 ---
+
 
 ## 🗂️ Notebook Structure
 
@@ -28,6 +30,15 @@ This notebook is divided into four major phases:
 **Phase 4:** Predicting Popularity via Classification Modeling – Reframes popularity as a binary classification task using Logistic Regression, Decision Tree, and Random Forest models.
 
 ---
+
+
+
+
+
+
+
+
+
 
 ## 🔗 Table of Contents
 
