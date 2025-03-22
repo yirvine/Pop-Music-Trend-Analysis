@@ -55,7 +55,7 @@ Each track’s metadata and audio attributes were retrieved programmatically in 
 !tar -xvf spark-3.3.3-bin-hadoop3.tgz
 ```
 
-📦 Spark installation output omitted for brevity.
+Spark installation output omitted for brevity.
 
 
 ```python
@@ -290,7 +290,7 @@ print(f"The most popular tempo in the dataset is {mode_tempo} BPM, which is foun
 
 An interesting observation from the histogram above: note how the frequency seems to jump up significantly at every multiple of 10! (e.g. 140 BPM vs 139 or 141)
 
-## 🎼 Key & Mode Analysis
+## Key & Mode Analysis
 **Let's analyze keys next:**
 
 ### 🎶 Mapping Keys to Musical Notation
@@ -408,7 +408,7 @@ plt.show()
 
 C major is the most popular key in this dataset. It's also the simplest key, involving only the white keys on the piano. It's the easiest key to play and often the first one that musicians are introduced to. Looks like 'simple' translates to 'popular' in the realm of pop music.
 
-## 🔗 Combining Features: Tempo & Key Analysis
+## Combining Features: Tempo & Key Analysis
 
 Ok, let's combine those features now and look at the most common key / tempo combinations:
 
@@ -449,7 +449,7 @@ plt.show()
 ![png](Top-10-Artists-Preliminary-Analysis_files/Top-10-Artists-Preliminary-Analysis_22_1.png)
     
 
-## 📈 Feature Relationships & Popularity Analysis
+## Feature Relationships & Popularity Analysis
 TODO: Investigate relationships between some of the features and the target variable, 'popularity'.
 
 Potential plots:
@@ -458,7 +458,7 @@ popularity vs danceability,
 popularity vs key, 
 popularity vs tempo, 
 
-### 🎭 Do Tempo & Danceability Impact Popularity?
+### Do Tempo & Danceability Impact Popularity?
 
 ```python
 
@@ -550,7 +550,7 @@ Looks like there isn't much correlation between danceability and popularity eith
 
 Back to our original target variable, Popularity.
 
-# 🤖 Predicting Popularity with Machine Learning
+# Predicting Popularity with Machine Learning
 
 Below, a linear regression model and random forest regression model are both applied to the dataset, using all ordinal numerical values as features. Key is not included as a feature because the integers are not ordinal (i.e. ranges from 0 to 11 cyclically, the jump from 0 to 1 is the same as the jump from 11 to 0).
 
@@ -710,16 +710,24 @@ plt.show()
 - Energy and Popularity exhibit a moderate negative correlation (-0.3), which is somewhat unexpected—suggesting that more energetic tracks are not necessarily more popular.
 - Valence (i.e., perceived mood) is negatively correlated with Danceability, Energy, and Loudness, which aligns with the idea that high-energy, danceable songs tend to feel less "moody" or melancholic.
 
+
+## Classification Modeling: Predicting Song Popularity
+
+In this section, we explore song popularity as a **binary classification problem**, labeling songs as either "low" or "high" popularity based on their Spotify popularity scores.
+
+---
+
+### 🔧 Data Preprocessing & Label Encoding
+
 ```python
-
-
-columns_to_drop = ["Album Name", "Release Date", "Added By", "Added At", "Genres", "Mode", "Spotify ID", "Artist IDs", "Track Name", "Artist Name(s)", "FirstArtist"]
+columns_to_drop = [
+    "Album Name", "Release Date", "Added By", "Added At", "Genres", "Mode",
+    "Spotify ID", "Artist IDs", "Track Name", "Artist Name(s)", "FirstArtist"
+]
 
 # Dropping the columns
 cleaned_df = cleaned_df.drop(*columns_to_drop)
-
 ```
-
 
 ```python
 from pyspark.sql.functions import when
@@ -731,9 +739,7 @@ cleaned_df = cleaned_df.withColumn(
     # .when((cleaned_df.Popularity > 50) & (cleaned_df.Popularity < 75), 'medium')
     .otherwise('high')
 )
-
 ```
-
 
 ```python
 from pyspark.sql.functions import when
@@ -768,57 +774,47 @@ data.show(10)
     only showing top 10 rows
     
 
-
-
 ```python
 from pyspark.sql.functions import col
 
 # Counting the values in 'popularity_level'
 popularity_level_counts = data.groupBy("popularity_level").count().orderBy("popularity_level")
-
-# Display the counts
 popularity_level_counts.show()
-
 ```
 
-    +----------------+-----+
-    |popularity_level|count|
-    +----------------+-----+
-    |               1|  654|
-    |               2| 1252|
-    +----------------+-----+
-    
+```
++----------------+-----+
+|popularity_level|count|
++----------------+-----+
+|               1|  654|
+|               2| 1252|
++----------------+-----+
+```
 
+---
 
-**Next we balanced out the data a bit since classification algorithms perform poorly with imbalanced data.**
-
+### Balancing the Dataset
 
 ```python
-from pyspark.sql.functions import col
-
 # Sample a subset of level 2 to match the count of level 1
 level_1_count = 654
 level_2_sample = data.filter(col('popularity_level') == 2).sample(withReplacement=False, fraction=level_1_count/1252)
 
-
 # Combine the samples with level 1 data
 balanced_data = data.filter(col('popularity_level') == 1).union(level_2_sample)
-
 ```
-
 
 ```python
 balanced_data.head()
-
 ```
 
-
-
-
+```
     Row(Duration (ms)=345251, Popularity=47, Danceability=0.425, Energy=0.782, Key=5, Loudness=-6.52, Speechiness=0.0892, Acousticness=0.737, Instrumentalness=0.000181, Liveness=0.5, Valence=0.41, Tempo=150.092, Time Signature=4, pop_rating='low', popularity_level=1)
+```
 
+---
 
-
+### Train-Test Split
 
 ```python
 # Separate features and target
@@ -828,35 +824,32 @@ y = balanced_data.select('popularity_level')
 
 # Split the data into training and testing sets
 train_data, test_data = balanced_data.randomSplit([0.75, 0.25], seed=42)
-
 ```
 
+---
+
+### 🖊️ Feature Engineering
 
 ```python
 from pyspark.sql.functions import when
 from pyspark.ml.feature import MinMaxScaler, VectorAssembler
 from pyspark.ml import Pipeline
 
-# Calculate the median or mean for 'Tempo' to replace zero values, if needed
+# Calculate the median for 'Tempo' to replace zero values
 median_tempo = balanced_data.approxQuantile('Tempo', [0.5], 0.01)[0]
-
-# Replace zero values in 'Tempo' if necessary
 balanced_data = balanced_data.withColumn('Tempo', when(col('Tempo') == 0, median_tempo).otherwise(col('Tempo')))
 
 # Assemble numerical features into a vector
-assembler = VectorAssembler(inputCols=['Duration (ms)', 'Danceability', 'Energy', 'Key', 'Loudness', 'Speechiness', 'Acousticness', 'Instrumentalness', 'Liveness', 'Valence', 'Tempo', 'Time Signature'], outputCol='features_vector')
+assembler = VectorAssembler(inputCols=['Duration (ms)', 'Danceability', 'Energy', 'Key', 'Loudness',
+    'Speechiness', 'Acousticness', 'Instrumentalness', 'Liveness', 'Valence', 'Tempo', 'Time Signature'],
+    outputCol='features_vector')
 
 # Scale the features
 scaler = MinMaxScaler(inputCol='features_vector', outputCol='scaled_features')
 
 # Pipeline: Assemble and then scale
 pipeline = Pipeline(stages=[assembler, scaler])
-
-
-
-
 ```
-
 
 ```python
 from pyspark.sql.functions import col, isnan, when, count
@@ -864,6 +857,7 @@ from pyspark.sql.functions import col, isnan, when, count
 # Check for null or NaN values in each column
 nulls_in_each_column = train_data.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in train_data.columns])
 nulls_in_each_column.show()
+```
 
 ```
 
@@ -874,168 +868,124 @@ nulls_in_each_column.show()
     +-------------+----------+------------+------+---+--------+-----------+------------+----------------+--------+-------+-----+--------------+----------+----------------+
     
 
-
+```
 
 ```python
 cleaned_train_data = train_data.dropna()
 cleaned_test_data = test_data.dropna()
-
 ```
-
 
 ```python
 # Fit and transform the data
-# Fit the pipeline on the training data
 fitted_pipeline = pipeline.fit(cleaned_train_data)
-
-# Transform both training and test data
 transformed_train_data = fitted_pipeline.transform(cleaned_train_data)
 transformed_test_data = fitted_pipeline.transform(cleaned_test_data)
-
-
 ```
 
-# **Modelling**:
-## (1) Logistic Regression
-## (2) Decision Tree
-## (3) Random Forest Classifier
+---
 
+## Model Training
 
+### Logistic Regression
 ```python
 from pyspark.ml.classification import LogisticRegression
 
-# Train a Logistic Regression model
 lr = LogisticRegression(featuresCol='scaled_features', labelCol='popularity_level')
 lr_model = lr.fit(transformed_train_data)
-
-# Make predictions on the test data
 lr_predictions = lr_model.transform(transformed_test_data)
-
 ```
-
 
 ```python
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
-# Evaluate accuracy
 evaluator = MulticlassClassificationEvaluator(labelCol="popularity_level", predictionCol="prediction", metricName="accuracy")
 accuracy = evaluator.evaluate(lr_predictions)
 print("Accuracy of Logistic Regression model: ", accuracy)
-
 ```
 
-    Accuracy of Logistic Regression model:  0.6363636363636364
+```
+Accuracy of Logistic Regression model:  0.636
+```
 
+---
 
-
+### Decision Tree
 ```python
 from pyspark.ml.classification import DecisionTreeClassifier
 
-# Train a Decision Tree model
 dt = DecisionTreeClassifier(featuresCol='scaled_features', labelCol='popularity_level')
 dt_model = dt.fit(transformed_train_data)
-
-# Make predictions on the test data
 dt_predictions = dt_model.transform(transformed_test_data)
 ```
 
-
 ```python
-# Evaluate accuracy
 dt_accuracy = evaluator.evaluate(dt_predictions)
 print("Accuracy of Decision Tree model: ", dt_accuracy)
 ```
 
-    Accuracy of Decision Tree model:  0.6201298701298701
+```
+Accuracy of Decision Tree model:  0.620
+```
 
+---
 
-
+### Random Forest
 ```python
 from pyspark.ml.classification import RandomForestClassifier
 
-# Train a Random Forest model
 rf = RandomForestClassifier(featuresCol='scaled_features', labelCol='popularity_level')
 rf_model = rf.fit(transformed_train_data)
-
-# Make predictions on the test data
 rf_predictions = rf_model.transform(transformed_test_data)
-
 ```
-
 
 ```python
-# Assuming your predictions from Random Forest model are stored in `rf_predictions`
 rf_accuracy = evaluator.evaluate(rf_predictions)
 print("Accuracy of Random Forest model: ", rf_accuracy)
-
 ```
 
-    Accuracy of Random Forest model:  0.6558441558441559
+```
+Accuracy of Random Forest model:  0.656
+```
 
+---
 
-# Hyper parameter tuning of the Random Forest **Model**
-
+## Hyperparameter Tuning (Random Forest)
 
 ```python
 from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
-from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
-# Create an instance of the Random Forest Classifier
-rf = RandomForestClassifier(featuresCol='scaled_features', labelCol='popularity_level')
-
-# Simplified parameter grid
 paramGrid = ParamGridBuilder() \
     .addGrid(rf.numTrees, [10, 15]) \
     .addGrid(rf.maxDepth, [5, 8]) \
     .build()
-```
 
-
-```python
-# Create a cross-validator with fewer folds
-crossval = CrossValidator(estimator=rf,
-                          estimatorParamMaps=paramGrid,
-                          evaluator=MulticlassClassificationEvaluator(labelCol="popularity_level",
-                          predictionCol="prediction", metricName="accuracy"),
-                          numFolds=3)
-```
-
-
-```python
-# Run cross-validation, and choose the best set of parameters.
+crossval = CrossValidator(estimator=rf, estimatorParamMaps=paramGrid, evaluator=evaluator, numFolds=3)
 cvModel = crossval.fit(transformed_train_data)
+cv_predictions = cvModel.transform(transformed_test_data)
 ```
 
-
 ```python
-# Make predictions on test data. cvModel uses the best model found.
-cv_predictions = cvModel.transform(transformed_test_data)
-
-# Evaluate the model
 cv_accuracy = evaluator.evaluate(cv_predictions)
 print("Accuracy after Hyperparameter Tuning: ", cv_accuracy)
 ```
 
-    Accuracy after Hyperparameter Tuning:  0.6558441558441559
+```
+Accuracy after Hyperparameter Tuning:  0.656
+```
 
+---
 
+## Confusion Matrix
 
 ```python
 from pyspark.mllib.evaluation import MulticlassMetrics
 
-# Convert the predictions DataFrame to an RDD of (prediction, label) tuples
 cv_predictions_and_labels = cv_predictions.select("prediction", "popularity_level").rdd.map(lambda row: (row[0], float(row[1])))
-
-# Instantiate metrics object
 cv_metrics = MulticlassMetrics(cv_predictions_and_labels)
 
-# Confusion Matrix
 cv_confusion_matrix = cv_metrics.confusionMatrix().toArray()
-
-# Output the Confusion Matrix
 print("Confusion Matrix:\n", cv_confusion_matrix)
 
-# True Positives, False Positives, True Negatives, and False Negatives can be extracted from the confusion matrix
 cv_tp = cv_confusion_matrix[1, 1]
 cv_fp = cv_confusion_matrix[0, 1]
 cv_tn = cv_confusion_matrix[0, 0]
@@ -1047,13 +997,21 @@ print(f"True Negatives: {cv_tn}")
 print(f"False Negatives: {cv_fn}")
 ```
 
-    Confusion Matrix:
-     [[ 86.  52.]
-     [ 54. 116.]]
-    True Positives: 116.0
-    False Positives: 52.0
-    True Negatives: 86.0
-    False Negatives: 54.0
+```
+Confusion Matrix:
+ [[ 86.  52.]
+  [ 54. 116.]]
+True Positives: 116.0
+False Positives: 52.0
+True Negatives: 86.0
+False Negatives: 54.0
+```
+
+---
+
+## Summary
+This classification approach produced **moderately strong results** relative to the regression-based analysis. The best model (Random Forest with tuning) achieved ~66% accuracy, suggesting that while audio features don’t predict Spotify popularity perfectly, they do offer **discernible patterns** when treated as a classification problem.
+
 
 
 ## 📚 References
@@ -1061,189 +1019,3 @@ print(f"False Negatives: {cv_fn}")
 - [Apache Spark Official Downloads](https://spark.apache.org/downloads.html)
 
 
-
-## Classification Modeling: Predicting Song Popularity
-
-In this section, we explore song popularity as a **binary classification problem**, labeling songs as either "low" or "high" popularity based on their Spotify popularity scores.
-
----
-
-```python
-# Drop irrelevant columns before modeling
-columns_to_drop = [
-    "Album Name", "Release Date", "Added By", "Added At", "Genres", "Mode",
-    "Spotify ID", "Artist IDs", "Track Name", "Artist Name(s)", "FirstArtist"
-]
-cleaned_df = cleaned_df.drop(*columns_to_drop)
-```
-
-```python
-from pyspark.sql.functions import when
-
-# Add binary popularity label: 'low' (<= 50) or 'high' (> 50)
-cleaned_df = cleaned_df.withColumn(
-    'pop_rating',
-    when(cleaned_df.Popularity <= 50, 'low').otherwise('high')
-)
-```
-
-```python
-# Assign numerical popularity level for modeling
-# 1 = low popularity, 2 = high popularity
-data = cleaned_df.withColumn(
-    'popularity_level',
-    when(cleaned_df.Popularity <= 50, 1).otherwise(2)
-)
-
-data.show(10)
-```
-
-```python
-from pyspark.sql.functions import col
-
-# Count how many songs fall into each popularity level
-popularity_level_counts = data.groupBy("popularity_level").count().orderBy("popularity_level")
-popularity_level_counts.show()
-```
-
-### Balancing the Dataset
-
-```python
-# Downsample high-popularity songs to match the number of low-popularity songs
-level_1_count = 654
-level_2_sample = data.filter(col('popularity_level') == 2).sample(
-    withReplacement=False, fraction=level_1_count/1252
-)
-
-# Combine balanced classes
-data_level_1 = data.filter(col('popularity_level') == 1)
-balanced_data = data_level_1.union(level_2_sample)
-```
-
-```python
-# Split features and target
-feature_columns = [col for col in balanced_data.columns if col != 'popularity_level']
-X = balanced_data.select(*feature_columns)
-y = balanced_data.select('popularity_level')
-
-# Train-test split
-train_data, test_data = balanced_data.randomSplit([0.75, 0.25], seed=42)
-```
-
-### Feature Engineering & Preprocessing
-
-```python
-from pyspark.sql.functions import when
-from pyspark.ml.feature import MinMaxScaler, VectorAssembler
-from pyspark.ml import Pipeline
-
-# Handle zero 'Tempo' values if present
-median_tempo = balanced_data.approxQuantile('Tempo', [0.5], 0.01)[0]
-balanced_data = balanced_data.withColumn(
-    'Tempo', when(col('Tempo') == 0, median_tempo).otherwise(col('Tempo'))
-)
-
-# Assemble and scale features
-assembler = VectorAssembler(
-    inputCols=[
-        'Duration (ms)', 'Danceability', 'Energy', 'Key', 'Loudness',
-        'Speechiness', 'Acousticness', 'Instrumentalness', 'Liveness',
-        'Valence', 'Tempo', 'Time Signature'
-    ],
-    outputCol='features_vector'
-)
-scaler = MinMaxScaler(inputCol='features_vector', outputCol='scaled_features')
-pipeline = Pipeline(stages=[assembler, scaler])
-```
-
-```python
-# Drop rows with null values
-cleaned_train_data = train_data.dropna()
-cleaned_test_data = test_data.dropna()
-
-# Fit and transform data
-fitted_pipeline = pipeline.fit(cleaned_train_data)
-transformed_train_data = fitted_pipeline.transform(cleaned_train_data)
-transformed_test_data = fitted_pipeline.transform(cleaned_test_data)
-```
-
----
-
-## Model Training & Evaluation
-
-### (1) Logistic Regression
-```python
-from pyspark.ml.classification import LogisticRegression
-from pyspark.ml.evaluation import MulticlassClassificationEvaluator
-
-lr = LogisticRegression(featuresCol='scaled_features', labelCol='popularity_level')
-lr_model = lr.fit(transformed_train_data)
-lr_predictions = lr_model.transform(transformed_test_data)
-
-evaluator = MulticlassClassificationEvaluator(
-    labelCol="popularity_level", predictionCol="prediction", metricName="accuracy"
-)
-print("Logistic Regression Accuracy:", evaluator.evaluate(lr_predictions))
-```
-
-### (2) Decision Tree
-```python
-from pyspark.ml.classification import DecisionTreeClassifier
-
-dt = DecisionTreeClassifier(featuresCol='scaled_features', labelCol='popularity_level')
-dt_model = dt.fit(transformed_train_data)
-dt_predictions = dt_model.transform(transformed_test_data)
-print("Decision Tree Accuracy:", evaluator.evaluate(dt_predictions))
-```
-
-### (3) Random Forest
-```python
-from pyspark.ml.classification import RandomForestClassifier
-
-rf = RandomForestClassifier(featuresCol='scaled_features', labelCol='popularity_level')
-rf_model = rf.fit(transformed_train_data)
-rf_predictions = rf_model.transform(transformed_test_data)
-print("Random Forest Accuracy:", evaluator.evaluate(rf_predictions))
-```
-
----
-
-## Hyperparameter Tuning (Random Forest)
-```python
-from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
-
-paramGrid = ParamGridBuilder() \
-    .addGrid(rf.numTrees, [10, 15]) \
-    .addGrid(rf.maxDepth, [5, 8]) \
-    .build()
-
-crossval = CrossValidator(
-    estimator=rf,
-    estimatorParamMaps=paramGrid,
-    evaluator=evaluator,
-    numFolds=3
-)
-cvModel = crossval.fit(transformed_train_data)
-cv_predictions = cvModel.transform(transformed_test_data)
-print("Tuned Random Forest Accuracy:", evaluator.evaluate(cv_predictions))
-```
-
-### Confusion Matrix
-```python
-from pyspark.mllib.evaluation import MulticlassMetrics
-
-cv_predictions_and_labels = cv_predictions.select("prediction", "popularity_level") \
-    .rdd.map(lambda row: (row[0], float(row[1])))
-cv_metrics = MulticlassMetrics(cv_predictions_and_labels)
-
-matrix = cv_metrics.confusionMatrix().toArray()
-print("Confusion Matrix:\n", matrix)
-print("True Positives:", matrix[1, 1])
-print("False Positives:", matrix[0, 1])
-print("True Negatives:", matrix[0, 0])
-print("False Negatives:", matrix[1, 0])
-```
-
----
-
-This classification approach provided stronger results than the regression task in earlier sections. Random Forests (with tuning) yielded up to **66% accuracy**, offering evidence that musical features can partially predict a track's popularity class.
