@@ -278,6 +278,9 @@ print(f"Visualization of number of songs per artist. OK I see you T-Swift!")
 
     Visualization of number of songs per artist. OK I see you T-Swift!
 
+<div align="center">
+  <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDN2dDlpdXZyczM2M3piOGNqYmI1aWR0bTVrcnA5bGZrdTN1cjluZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fOd1Uwm3uNosemzD6L/giphy.gif" alt="tswift" width="200"/>
+</div>
 
 ### Distribution of Song Tempos
 
